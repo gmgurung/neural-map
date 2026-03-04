@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manish Gurung :: Neural Profile Network</title>
+    <style>
+        /* --- CORE STYLES & VARIABLES --- */
+        :root {
+            /* User Provided Color Palette */
+            --c-onyx: #0a090c;
+            --c-platinum: #f0edee;
+            --c-dark-teal: #07393c;
+            --c-stormy-teal: #2c666e;
+            --c-frosted-blue: #90ddf0;
+
+            /* Applied Application Colors */
+            --bg-color: #ffffff; 
+            --sidebar-bg: var(--c-platinum); 
+            
+            /* Neurons */
+            --neuron-bg: var(--c-frosted-blue); 
+            --neuron-active: var(--c-stormy-teal); 
+            
+            /* Text */
+            --neuron-text: var(--c-onyx); 
+            --neuron-text-light: #ffffff;
+            
+            /* Lines and Labels */
+            --connection-color: var(--c-onyx); 
+            --label-text: var(--c-dark-teal); 
+            
+            /* Component Borders */
+            --border-dark: var(--c-onyx);
+
+            /* Typography System */
+            --font-main: 'Cascadia Code', Consolas, Monaco, 'Lucida Console', monospace;
+            --font-header: 'Impact', fantasy, sans-serif;
+
+            --neuron-height: 48px;
+            --neuron-padding: 0 24px;
+            --neuron-radius: 24px; 
+            --gap-y: 140px; 
+            --gap-x: 20px; 
+
+            --modal-backdrop: rgba(10, 9, 12, 0.7); 
+            --modal-content-bg: #ffffff;
+            
+            --sidebar-width: 18%;
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--neuron-text);
+            font-family: var(--font-main); 
+            overflow-x: hidden; 
+        }
+
+        /* --- LAYOUT CONTAINERS --- */
+        .layout-container {
+            display: flex;
+            width: 100vw;
+            min-height: 100vh;
+        }
+
+        /* Left Column */
+        .sidebar {
+            width: var(--sidebar-width);
+            min-width: 230px; 
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            background-color: var(--sidebar-bg); 
+            border-right: 3px solid var(--border-dark);
+            padding: 40px 20px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            gap: 25px; 
+            overflow-y: auto;
+            z-index: 100;
+        }
+
+        .sidebar-main-title {
+            font-family: var(--font-header); 
+            font-size: 24.2px; /* DECREASED 1px: 25.2px -> 24.2px */
+            font-weight: normal; 
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--c-dark-teal);
+            text-align: center;
+            padding-bottom: 15px;
+            border-bottom: 3px solid var(--border-dark);
+            margin-bottom: 5px;
+        }
+
+        /* Right Column */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            width: calc(100% - var(--sidebar-width));
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 40px;
+            padding-bottom: 120px; 
+            position: relative;
+            z-index: 1; 
+            overflow-x: auto;
+        }
+
+        /* --- SIDEBAR CARDS --- */
+        .sidebar-card {
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            border: 2px solid var(--border-dark);
+            box-shadow: 4px 4px 0px rgba(10, 9, 12, 0.1); 
+            font-size: 13.2px; /* DECREASED 1px: 14.2px -> 13.2px */
+        }
+
+        .card-title {
+            font-family: var(--font-header); 
+            font-size: 16.2px; /* DECREASED 1px: 17.2px -> 16.2px */
+            font-weight: normal;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            color: var(--c-dark-teal);
+            border-bottom: 2px solid var(--c-onyx);
+            padding-bottom: 8px;
+        }
+
+        .contact-info {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            color: var(--neuron-text);
+        }
+        .contact-item strong {
+            color: var(--c-stormy-teal);
+            margin-right: 8px;
+        }
+        .contact-item { word-break: break-word; }
+
+        .important-links {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .link-btn {
+            background-color: var(--c-platinum);
+            border: 2px solid var(--border-dark);
+            color: var(--neuron-text);
+            padding: 10px 12px;
+            border-radius: 4px;
+            font-size: 12.2px; /* DECREASED 1px: 13.2px -> 12.2px */
+            font-weight: bold;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            text-align: center;
+            font-family: var(--font-main);
+        }
+        .link-btn:hover {
+            background-color: var(--c-stormy-teal);
+            color: var(--neuron-text-light);
+            transform: translateY(-2px);
+            box-shadow: 2px 2px 0px var(--c-onyx);
+        }
+
+        .network-legend { color: var(--neuron-text); }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+            font-size: 12.2px; /* DECREASED 1px: 13.2px -> 12.2px */
+            font-weight: bold;
+        }
+        .legend-item:last-child { margin-bottom: 0; }
+        .legend-color {
+            width: 18px;
+            height: 18px;
+            border-radius: 4px;
+            margin-right: 12px;
+            border: 2px solid var(--border-dark);
+            flex-shrink: 0; 
+        }
+
+        .legend-color.box-input { background-color: var(--c-platinum); }
+        .legend-color.box-ed-skill { background-color: var(--c-frosted-blue); }
+        .legend-color.box-project { background-color: var(--c-stormy-teal); }
+        .legend-color.box-work { background-color: var(--c-dark-teal); }
+        .legend-color.box-output { background-color: var(--c-onyx); }
+
+        /* --- MAIN ARCHITECTURE CONTENT --- */
+        .profile-name {
+            font-family: var(--font-header); 
+            background-color: var(--c-dark-teal);
+            color: var(--neuron-text-light);
+            padding: 10px 40px;
+            font-size: 34px; 
+            font-weight: normal;
+            border-radius: 8px;
+            letter-spacing: 2px;
+            border: 2px solid var(--border-dark);
+            box-shadow: 4px 4px 0px rgba(10, 9, 12, 0.15);
+            margin-bottom: 15px; 
+            z-index: 30; 
+            text-transform: uppercase;
+        }
+
+        .architecture-wrapper {
+            position: relative;
+            padding: 20px 0 60px 0; 
+            z-index: 5; 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            transform: scale(0.85);
+            transform-origin: top center;
+            margin: 0 auto;
+        }
+
+        /* --- LAYER BOXES --- */
+        .layer {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+            gap: var(--gap-x);
+            margin-bottom: var(--gap-y);
+            position: relative;
+            min-height: calc(var(--neuron-height) + 20px);
+            z-index: 10; 
+            transition: all 0.3s ease;
+            box-sizing: border-box; 
+        }
+        .layer:last-child { margin-bottom: 0; }
+
+        .layer-box {
+            border: 3px dashed var(--border-dark);
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .box-input { background-color: rgba(240, 237, 238, 0.9); } 
+        .box-ed-skill { background-color: rgba(144, 221, 240, 0.25); } 
+        .box-project { background-color: rgba(44, 102, 110, 0.2); } 
+        .box-work { background-color: rgba(7, 57, 60, 0.15); } 
+        .box-output { background-color: rgba(10, 9, 12, 0.1); } 
+
+        .layer[data-layer-id="layer-2"] { min-width: 900px; }
+        .layer[data-layer-id="layer-3"] { min-width: 700px; }
+        .layer[data-layer-id="layer-4"] { min-width: 500px; }
+        .layer[data-layer-id="layer-5"] { min-width: 300px; }
+
+        /* --- NEURONS --- */
+        .neuron {
+            background-color: var(--neuron-bg);
+            height: var(--neuron-height);
+            border-radius: var(--neuron-radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: var(--neuron-padding);
+            cursor: pointer;
+            transition: transform 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+            border: 2px solid var(--border-dark);
+            box-sizing: border-box;
+            position: relative;
+            z-index: 30; 
+            white-space: nowrap; 
+        }
+
+        .neuron:hover {
+            background-color: var(--neuron-active);
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 4px 6px 0px rgba(10, 9, 12, 0.2);
+            color: var(--neuron-text-light);
+        }
+
+        .neuron-label {
+            font-size: 16px; 
+            font-weight: bold;
+            text-transform: uppercase;
+            font-family: var(--font-main); 
+            letter-spacing: 0.5px;
+            pointer-events: none; 
+        }
+
+        .input-code {
+            color: var(--c-dark-teal);
+            margin-right: 6px;
+        }
+
+        [data-layer-id="layer-5"] .neuron {
+            background-color: var(--c-dark-teal);
+            color: var(--neuron-text-light);
+        }
+
+        [data-layer-id="layer-5"] .neuron:hover {
+            background-color: var(--c-stormy-teal);
+            transform: translateY(-3px) scale(1.05);
+        }
+
+        /* --- LINES (SVG) --- */
+        #connection-svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none; 
+            z-index: 20; 
+        }
+
+        path.connection-line {
+            fill: none;
+            stroke: var(--connection-color);
+            stroke-width: 1.5px; 
+            transition: stroke 0.3s ease;
+        }
+
+        path.connection-line[marker-end] { marker-end: url(#arrowhead); }
+
+        /* --- MODAL DIALOG --- */
+        #details-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--modal-backdrop); 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            z-index: 1000; 
+        }
+
+        #details-modal.open {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-content {
+            background-color: var(--modal-content-bg);
+            border: 3px solid var(--border-dark);
+            width: 90%;
+            max-width: 650px;
+            max-height: 85vh;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 8px 8px 0px rgba(10, 9, 12, 0.2); 
+            position: relative;
+            transform: translateY(20px);
+            transition: transform 0.3s ease;
+            overflow-y: auto;
+            line-height: 1.6; 
+            font-size: 18px; 
+        }
+
+        #details-modal.open .modal-content { transform: translateY(0); }
+
+        .close-modal {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 30px; 
+            font-weight: bold;
+            cursor: pointer;
+            color: var(--c-onyx);
+            background: none;
+            border: none;
+            line-height: 1;
+        }
+
+        .close-modal:hover { color: var(--c-stormy-teal); }
+
+        .modal-body h2 {
+            font-family: var(--font-header); 
+            margin-top: 0;
+            color: var(--c-dark-teal);
+            text-transform: uppercase;
+            font-size: 34px; 
+            font-weight: normal;
+            letter-spacing: 2px;
+            border-bottom: 3px solid var(--c-onyx);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        .modal-body h3 {
+            font-family: var(--font-header); 
+            color: var(--c-stormy-teal);
+            font-size: 24px; 
+            font-weight: normal;
+            letter-spacing: 1px;
+            margin-top: 25px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+        
+        .modal-body p { margin-bottom: 15px; }
+        
+        .modal-body ul {
+            padding-left: 20px;
+            margin-bottom: 15px;
+        }
+        
+        .modal-body li { margin-bottom: 8px; }
+
+        .modal-placeholder {
+            color: var(--label-text-dark);
+            font-style: italic;
+            border-left: 3px solid var(--c-onyx);
+            padding-left: 15px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="layout-container">
+        <aside class="sidebar">
+            <div class="sidebar-main-title">Important Stuff</div>
+
+            <div class="sidebar-card contact-info">
+                <div class="card-title">Contact Information</div>
+                <div class="contact-item"><strong>E:</strong> manishgurung5g@gmail.com</div>
+                <div class="contact-item"><strong>P:</strong> 256-365-4515</div>
+                <div class="contact-item"><strong>L:</strong> Philadelphia, PA</div>
+            </div>
+
+            <div class="sidebar-card important-links">
+                <div class="card-title">Important Links</div>
+                <a href="https://www.linkedin.com/in/manish-gurungg" class="link-btn" target="_blank">LinkedIn</a>
+                <a href="#" class="link-btn" target="_blank">Resume</a>
+                <a href="#" class="link-btn" target="_blank">Transcript</a>
+                <a href="https://github.com/gmgurung" class="link-btn" target="_blank">GitHub</a>
+                <a href="#" class="link-btn" target="_blank">Socials</a>
+            </div>
+
+            <div class="sidebar-card network-legend">
+                <div class="card-title">Architecture Legend</div>
+                <div class="legend-item"><div class="legend-color box-input"></div><span>Input Layer</span></div>
+                <div class="legend-item"><div class="legend-color box-ed-skill"></div><span>Education & Skills Layer</span></div>
+                <div class="legend-item"><div class="legend-color box-project"></div><span>Projects Layer</span></div>
+                <div class="legend-item"><div class="legend-color box-work"></div><span>Work Experience Layer</span></div>
+                <div class="legend-item"><div class="legend-color box-output"></div><span>Output Layer</span></div>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div class="profile-name">EXPLORE HERE</div>
+            
+            <div class="architecture-wrapper">
+                <svg id="connection-svg">
+                    <defs>
+                        <marker id="arrowhead" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+                            <polygon points="0 0, 8 3, 0 6" fill="#0a090c" />
+                        </marker>
+                    </defs>
+                </svg>
+            </div>
+        </main>
+    </div> 
+
+    <div id="details-modal">
+        <div class="modal-content">
+            <button class="close-modal">&times;</button>
+            <div class="modal-body">
+                <h2 id="modal-title">Neuron Details</h2>
+                <div id="modal-content-text">
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script>
+    const networkData = {
+        name: "Manish Gurung",
+        layers: [
+            { 
+                id: "layer-1", 
+                boxClass: "box-input", 
+                neurons: [
+                    { 
+                        id: "ed-main", 
+                        code: "X1:", 
+                        label: "EDUCATION",
+                        content: `<p>The foundational input layer processing academic knowledge. This node feeds into specific institutional experiences, encompassing both Computer Science and Data Science paradigms.</p>`
+                    },
+                    { 
+                        id: "skills-main", 
+                        code: "X2:", 
+                        label: "SKILLS",
+                        content: `<p>The technical input layer. This node acts as the parameter weights representing programming languages, cloud infrastructure, and core ML/DL competencies developed over time.</p>`
+                    }
+                ]
+            },
+            { 
+                id: "layer-2", 
+                boxClass: "box-ed-skill", 
+                neurons: [
+                    { 
+                        id: "ed-1", 
+                        label: "Drexel Univ.",
+                        content: `
+                            <h3>B.S., Data Science, Minor in International Economics</h3>
+                            <p><strong>Expected:</strong> Jun 2026 | Philadelphia, PA<br><strong>GPA:</strong> 3.81/4.00</p>
+                            <ul>
+                                <li><strong>Achievements:</strong> Dean's List (all quarter), A. J. Drexel Scholarship</li>
+                                <li><strong>Coursework:</strong> Applied Deep Learning, Cloud Computing, Recommender Systems, Data Science Programming</li>
+                            </ul>
+                        `
+                    },
+                    { 
+                        id: "ed-2", 
+                        label: "Norwich Univ.",
+                        content: `
+                            <h3>B.S., Computer Science</h3>
+                            <p><strong>Aug 2022 - Apr 2023</strong> | Northfield, VA<br><strong>GPA:</strong> 3.96/4.00</p>
+                            <ul>
+                                <li><strong>Achievements:</strong> Dean's List (Fall & Spring Semester), Presidential Scholarship</li>
+                                <li><strong>Coursework:</strong> Python Programming, Calculus 1 & 2</li>
+                            </ul>
+                        `
+                    },
+                    { 
+                        id: "skill-1", 
+                        label: "Programming",
+                        content: `
+                            <h3>Core Languages</h3>
+                            <ul>
+                                <li>Python (Pandas, NumPy, Scikit-Learn, TensorFlow, PyTorch, Matplotlib, Seaborn)</li>
+                                <li>SQL</li>
+                                <li>R</li>
+                            </ul>
+                        `
+                    },
+                    { 
+                        id: "skill-2", 
+                        label: "Cloud & Big Data",
+                        content: `
+                            <h3>Data Infrastructure</h3>
+                            <ul>
+                                <li>AWS, GCP, Azure</li>
+                                <li>BigQuery</li>
+                                <li>Databricks</li>
+                                <li>Spark</li>
+                            </ul>
+                        `
+                    },
+                    { 
+                        id: "skill-3", 
+                        label: "Tools",
+                        content: `
+                            <h3>Development & Analytics Tools</h3>
+                            <ul>
+                                <li>Git, Jupyter, Docker</li>
+                                <li>Power BI, Tableau</li>
+                                <li>Streamlit</li>
+                                <li>Excel, SPSS, Oracle DB</li>
+                            </ul>
+                        `
+                    },
+                    { 
+                        id: "skill-4", 
+                        label: "Machine Learning",
+                        content: `
+                            <h3>ML Algorithms & Statistics</h3>
+                            <ul>
+                                <li>Regression, Classification, SVM</li>
+                                <li>Random Forests, Gradient Boosting</li>
+                                <li>Hypothesis Testing, Bayesian Probability</li>
+                                <li>Statistical Analysis, A/B Testing, Time Series Forecasting</li>
+                            </ul>
+                        `
+                    },
+                    { 
+                        id: "skill-5", 
+                        label: "Deep Learning",
+                        content: `
+                            <h3>DL Architectures & MLOps</h3>
+                            <ul>
+                                <li>CNN, RNN, Transformers/BERT</li>
+                                <li>LLM Integration</li>
+                                <li>Computer Vision</li>
+                                <li>NLP (Tokenization, NER)</li>
+                                <li>MLOps</li>
+                            </ul>
+                        `
+                    },
+                    { 
+                        id: "skill-6", 
+                        label: "Certifications",
+                        content: `
+                            <h3>Professional Certifications & Soft Skills</h3>
+                            <ul>
+                                <li><strong>Certifications:</strong> Google Data Analytics (Professional)</li>
+                                <li><strong>Soft Skills:</strong> Adaptability, Teamwork, Time Management, Problem-solving</li>
+                            </ul>
+                        `
+                    }
+                ]
+            },
+            { 
+                id: "layer-3", 
+                boxClass: "box-project", 
+                neurons: [
+                    { 
+                        id: "proj-1", 
+                        label: "Reddit NLP",
+                        content: `
+                            <h3>Reddit Comments Toxicity Analysis</h3>
+                            <p><strong>Sep 2025</strong></p>
+                            <ul>
+                                <li>Pre-processed a large-scale dataset of over 50,000 Reddit comments from 10 diverse subreddits using the Python Reddit API Wrapper (PRAW).</li>
+                                <li>Fine-tuned a BERT-base-uncased transformer model for binary toxicity classification, achieving 95.1% accuracy.</li>
+                                <li>Built custom NLP pipeline with tokenization and positional encoding to train an ID-CNN model, achieving 96.5% accuracy while reducing training time by 40% compared to a transformer baseline.</li>
+                            </ul>
+                        `
+                    },
+                    { 
+                        id: "proj-2", 
+                        label: "Ripeness CNN",
+                        content: `
+                            <h3>Banana Ripeness Classifier & Culinary Assistant</h3>
+                            <p><strong>Nov 2025</strong></p>
+                            <ul>
+                                <li>Engineered an end-to-end banana ripeness classification system using a custom 2D-CNN architecture (3 conv layers, 96K parameters), achieving 94.3% test accuracy on 13K images.</li>
+                                <li>Deployed a production-ready Streamlit web application integrating a TensorFlow model with Llama-3-8B LLM via Hugging Face API, generating contextual explanations and shelf-life predictions.</li>
+                                <li>Implemented MLOps best practices including data augmentation, early stopping, learning rate scheduling, and Tensorboard experiment tracking.</li>
+                            </ul>
+                        `
+                    },
+                    { 
+                        id: "proj-3", 
+                        label: "Entity Rec.",
+                        content: `
+                            <h3>Named Entity Recognition</h3>
+                            <p><strong>Aug 2025</strong></p>
+                            <ul>
+                                <li>Preprocessed and vectorized 45,000+ IOB-tagged sentences with positional encoding to capture contextual word relationships for multi-class entity classification (PER, ORG, LOC, MISC).</li>
+                                <li>Developed an ID-CNN architecture achieving 99.04% test accuracy for named entity recognition.</li>
+                                <li>Outperformed LSTM and SimpleRNN baselines by 2.3% while reducing training time by 70%.</li>
+                            </ul>
+                        `
+                    },
+                    { 
+                        id: "proj-4", 
+                        label: "PlantDoc",
+                        content: `
+                            <h3>PlantDoc Classification</h3>
+                            <p><strong>May 2024</strong></p>
+                            <ul>
+                                <li>Processed and scaled 20,000 images with NumPy and Scikit-learn to enable faster training, designing a 2D-CNN with ReLU and SoftMax layers for accurate classification.</li>
+                                <li>Optimized architecture through hyperparameter tuning (learning rate, batch size, dropout), improving accuracy from 75% to 90%.</li>
+                                <li>Deployed the model via Firebase for real-time plant disease detection.</li>
+                            </ul>
+                        `
+                    },
+                    { 
+                        id: "proj-5", 
+                        label: "Telemetry Proj.",
+                        content: `
+                            <h3>Telemetry Capstone Project</h3>
+                            <p><strong>Nov 2025 - Jan 2026</strong></p>
+                            <ul>
+                                <li>Led the development of a comprehensive capstone project focused on processing and analyzing streaming telemetry data.</li>
+                                <li>Designed anomaly detection pipelines and regression models to monitor operational health and predict system outages based on incoming metrics.</li>
+                            </ul>
+                        `
+                    }
+                ]
+            },
+            { 
+                id: "layer-4", 
+                boxClass: "box-work", 
+                neurons: [
+                    { 
+                        id: "exp-1", 
+                        label: "PECO",
+                        content: `
+                            <h3>Reliability Reporting And Data Analytics co-op</h3>
+                            <p><strong>PECO, an Exelon company</strong> | Sep 2025 - Present (Philadelphia, PA)</p>
+                            <ul>
+                                <li>Validate daily outage event data across internal systems for 1.6M customers, ensuring accuracy in transformer configurations, customer associations, and power restoration timestamps.</li>
+                                <li>Perform advanced data analytics techniques using Python and Pandas to interpret customer reliability history, geospatial mapping data, and meter data.</li>
+                                <li>Develop Power BI dashboards visualizing reliability metrics and storm impact analysis across 200+ service territories.</li>
+                            </ul>
+                        `
+                    },
+                    { 
+                        id: "exp-2", 
+                        label: "Drexel TA",
+                        content: `
+                            <h3>Course Assistant</h3>
+                            <p><strong>Drexel University</strong> | Apr 2025 - Sep 2025 (Philadelphia, PA)</p>
+                            <p><strong>Courses:</strong> Recommender System, Data Science Programming, System Design</p>
+                            <ul>
+                                <li>Supported 60+ students through ML assignment grading, technical debugging, and weekly office hours.</li>
+                                <li>Consistently earned a 4.5/5 satisfaction rating from students and faculty for effective technical communication and assistance.</li>
+                            </ul>
+                        `
+                    },
+                    { 
+                        id: "exp-3", 
+                        label: "NBME",
+                        content: `
+                            <h3>Technical Marketing Analyst co-op</h3>
+                            <p><strong>National Board of Medical Examiners (NBME)</strong> | Oct 2024 - Mar 2025 (Philadelphia, PA)</p>
+                            <ul>
+                                <li>Engineered an RNN-based time series model using TensorFlow to forecast monthly site traffic, achieving 85% accuracy (MAE 7450.08).</li>
+                                <li>Automated survey data cleaning and labelling via a Python-SPSS ETL pipeline, saving 80%+ manual effort on datasets containing 500K-5M rows.</li>
+                                <li>Optimized website performance through GA4 analytics and SEO enhancements, increasing organic search traffic by 5% over 4 months.</li>
+                            </ul>
+                        `
+                    }
+                ]
+            },
+            { 
+                id: "layer-5", 
+                boxClass: "box-output", 
+                neurons: [
+                    { 
+                        id: "output-final", 
+                        label: "Find More", 
+                        content: `
+                            <h3>The Goal: Data Scientist</h3>
+                            <p>Born and raised in Nepal, I am a massive football fan and travel enthusiast. My academic journey began in Computer Science but quickly pivoted to <strong>Data Science</strong> (with a minor in International Economics) to better understand the business impact of technology, trade, and financial systems.</p>
+                            <p>I am actively seeking internships in ML/AI and data analytics. My ultimate goal is to drive decisions through deep statistical analysis and machine learning.</p>
+                            
+                            <h3>My Approach</h3>
+                            <p>While I have experience fine-tuning LLMs, I recently paused that to focus purely on the foundational mathematics and inner workings of core machine learning algorithms. To be the best, I need to know exactly how these models work under the hood, not just how to implement them. I pride myself on being an independent, creative problem solver who looks at data from unconventional perspectives.</p>
+
+                            <h3>Relevant Coursework</h3>
+                            <ul>
+                                <li>Applied Deep Learning</li>
+                                <li>Recommender Systems</li>
+                                <li>Exploratory & Advanced Data Analytics</li>
+                                <li>Data Science Programming</li>
+                                <li>Business Statistics, Calculus I & II, and Linear Algebra</li>
+                            </ul>
+                        `
+                    }
+                ]
+            }
+        ]
+    };
+
+    const arcWrapper = document.querySelector(".architecture-wrapper");
+    const svgLayer = document.getElementById("connection-svg");
+    const modal = document.getElementById("details-modal");
+    const modalTitle = document.getElementById("modal-title");
+    const closeModalBtn = document.querySelector(".close-modal");
+
+    document.addEventListener("DOMContentLoaded", () => {
+        renderLayers();
+        setTimeout(drawConnections, 50); 
+        window.addEventListener("resize", drawConnections);
+        initModal();
+    });
+
+    function renderLayers() {
+        networkData.layers.forEach(layer => {
+            const layerEl = document.createElement("div");
+            layerEl.className = "layer";
+            
+            if (layer.boxClass) {
+                layerEl.classList.add("layer-box");
+                layerEl.classList.add(layer.boxClass);
+            }
+            
+            layerEl.id = layer.id;
+            layerEl.setAttribute("data-layer-id", layer.id);
+
+            layer.neurons.forEach(neuron => {
+                const neuronEl = document.createElement("div");
+                neuronEl.className = "neuron";
+                neuronEl.id = neuron.id; 
+                
+                let html = '<span class="neuron-label">';
+                if (neuron.code) html += `<span class="input-code">${neuron.code}</span>`;
+                html += neuron.label;
+                html += '</span>';
+                
+                neuronEl.innerHTML = html;
+                layerEl.appendChild(neuronEl);
+            });
+
+            arcWrapper.appendChild(layerEl);
+        });
+    }
+
+    function drawConnections() {
+        const paths = svgLayer.querySelectorAll("path");
+        paths.forEach(p => p.remove());
+
+        const layersInOrder = networkData.layers;
+
+        for (let i = 0; i < layersInOrder.length - 1; i++) {
+            const currentLayer = layersInOrder[i];
+            const nextLayer = layersInOrder[i + 1];
+
+            const currentLayerEl = document.getElementById(currentLayer.id);
+            const nextLayerEl = document.getElementById(nextLayer.id);
+
+            if (!currentLayerEl || !nextLayerEl) continue;
+
+            currentLayer.neurons.forEach(fromNeuron => {
+                const fromEl = document.getElementById(fromNeuron.id);
+                if (!fromEl) return;
+
+                const startX = currentLayerEl.offsetLeft + fromEl.offsetLeft + (fromEl.offsetWidth / 2);
+                const startY = currentLayerEl.offsetTop + fromEl.offsetTop + fromEl.offsetHeight;
+
+                nextLayer.neurons.forEach(toNeuron => {
+                    const toEl = document.getElementById(toNeuron.id);
+                    if (!toEl) return;
+
+                    const endX = nextLayerEl.offsetLeft + toEl.offsetLeft + (toEl.offsetWidth / 2);
+                    const endY = nextLayerEl.offsetTop + toEl.offsetTop;
+
+                    const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                    path.setAttribute("d", `M ${startX} ${startY} L ${endX} ${endY}`);
+                    path.setAttribute("class", "connection-line");
+                    path.setAttribute("marker-end", "url(#arrowhead)");
+                    svgLayer.appendChild(path);
+                });
+            });
+        }
+    }
+
+    function initModal() {
+        document.body.addEventListener("click", (e) => {
+            const neuronEl = e.target.closest(".neuron");
+            if (neuronEl) {
+                const neuronId = neuronEl.id;
+                let clickedNeuronData = null;
+
+                networkData.layers.forEach(layer => {
+                    const found = layer.neurons.find(n => n.id === neuronId);
+                    if (found) clickedNeuronData = found;
+                });
+
+                if (clickedNeuronData) {
+                    modalTitle.innerText = clickedNeuronData.label;
+                    const contentDiv = document.getElementById("modal-content-text");
+                    
+                    if (clickedNeuronData.content) {
+                        contentDiv.innerHTML = clickedNeuronData.content;
+                    } else {
+                        contentDiv.innerHTML = "<p class='modal-placeholder'>Details coming soon...</p>";
+                    }
+                    
+                    modal.classList.add("open");
+                }
+            }
+        });
+
+        closeModalBtn.addEventListener("click", closeModal);
+        modal.addEventListener("click", (e) => {
+            if (e.target === modal) closeModal(); 
+        });
+        document.addEventListener("keydown", (e) => {
+            if (e.key === "Escape" && modal.classList.contains("open")) closeModal();
+        });
+    }
+
+    function closeModal() {
+        modal.classList.remove("open");
+    }
+
+</script>
+</body>
+</html>
