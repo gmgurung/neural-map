@@ -309,11 +309,12 @@
             background: var(--neuron-bg); height: 52px;
             border: 1px solid var(--border);
             display: flex; align-items: center; justify-content: center; padding: 0 22px;
-            cursor: pointer; transition: all 0.3s var(--ease);
+            cursor: pointer; transition: all 0.3s var(--ease), opacity 0.3s ease;
             font-family: var(--font-b); font-weight: 500; font-size: 17px;
             text-transform: uppercase; letter-spacing: 1px; position: relative;
             white-space: nowrap; backdrop-filter: blur(4px); color: var(--text);
         }
+        .neuron.dimmed { opacity: 0.25; transform: scale(0.97); }
         .neuron:hover {
             border-color: var(--border-bright); color: var(--accent);
             background: var(--accent-hover);
@@ -327,9 +328,23 @@
         .input-code { font-family: var(--font-m); font-size: 13px; opacity: 0.32; margin-right: 8px; color: var(--accent); }
 
         /* ── CONNECTIONS ── */
-        path.connection-line { fill: none; stroke: var(--conn); stroke-width: 1px; opacity: 0; transition: opacity 0.4s ease; }
+        path.connection-line { fill: none; stroke: var(--conn); stroke-width: 1px; opacity: 0; transition: opacity 0.4s ease, stroke 0.3s ease, stroke-width 0.3s ease; }
         path.line-visible { opacity: 1; }
         path.line-active  { opacity: 1; stroke: var(--conn-active); stroke-width: 1.5px; }
+        path.connection-line.dimmed { opacity: 0.15; }
+        path.connection-line.highlighted-path {
+            stroke: #38bdf8;
+            stroke-width: 2px;
+            opacity: 1;
+            filter: drop-shadow(0 0 6px rgba(56, 189, 248, 0.7));
+            z-index: 10;
+        }
+        @keyframes drawLine {
+            to { stroke-dashoffset: 0; }
+        }
+        path.connection-line.draw-anim {
+            animation: drawLine 0.7s ease forwards;
+        }
         .signal-particle  { fill: var(--accent); }
 
         /* ── CENTERED MODAL ── */
@@ -817,8 +832,7 @@ async function init() {
         }, 90);
     } else {
         loadScreen.style.display = 'none';
-        document.querySelectorAll('.layer').forEach(l => l.classList.add('activated'));
-        drawConnections(true);
+        await startAnimation();
     }
 }
 
@@ -826,20 +840,41 @@ async function startAnimation() {
     const layers = document.querySelectorAll('.layer');
     for (let i = 0; i < layers.length; i++) {
         layers[i].classList.add('activated');
-        const neurons = layers[i].querySelectorAll('.neuron');
-        neurons.forEach(n => n.classList.add('active-pulse'));
-        if (i < layers.length - 1) await fireSignals(layers[i], layers[i + 1]);
         await delay(200);
-        neurons.forEach(n => n.classList.remove('active-pulse'));
-        await delay(80);
     }
-    drawConnections(true);
+    await drawAnimatedConnections();
+    initHoverTracing();
 }
 
-async function fireSignals(a, b) {
-    const nA = a.querySelectorAll('.neuron'), nB = b.querySelectorAll('.neuron');
-    nA.forEach(x => nB.forEach(y => createSignal(x, y)));
-    await delay(660);
+async function drawAnimatedConnections() {
+    svgLayer.innerHTML = '';
+    const layers = Array.from(document.querySelectorAll('.layer.activated'));
+    for (let i = 0; i < layers.length - 1; i++) {
+        const nA_list = layers[i].querySelectorAll('.neuron');
+        const nB_list = layers[i+1].querySelectorAll('.neuron');
+        
+        nA_list.forEach(nA => {
+            nB_list.forEach(nB => {
+                const p = makeSvg('path');
+                p.setAttribute('d', getBezier(nA.getBoundingClientRect(), nB.getBoundingClientRect()));
+                p.setAttribute('data-from', nA.id);
+                p.setAttribute('data-to', nB.id);
+                p.setAttribute('class', 'connection-line line-visible draw-anim');
+                svgLayer.appendChild(p);
+                const len = p.getTotalLength();
+                p.style.strokeDasharray = len;
+                p.style.strokeDashoffset = len;
+            });
+        });
+        await delay(150);
+    }
+    setTimeout(() => {
+        document.querySelectorAll('.connection-line').forEach(p => {
+            p.classList.remove('draw-anim');
+            p.style.strokeDasharray = '';
+            p.style.strokeDashoffset = '';
+        });
+    }, 1000);
 }
 
 function getBezier(rA, rB) {
@@ -847,24 +882,6 @@ function getBezier(rA, rB) {
     const x1 = rA.left + rA.width / 2 - wr.left, y1 = rA.bottom - wr.top;
     const x2 = rB.left + rB.width / 2 - wr.left, y2 = rB.top   - wr.top;
     return `M ${x1} ${y1} C ${x1} ${y1+(y2-y1)*0.4}, ${x2} ${y1+(y2-y1)*0.6}, ${x2} ${y2}`;
-}
-
-function createSignal(elA, elB) {
-    const d   = getBezier(elA.getBoundingClientRect(), elB.getBoundingClientRect());
-    const pid = `sp-${Date.now()}-${Math.random().toString(36).slice(2)}`;
-    const path = makeSvg('path');
-    path.setAttribute('d', d); path.setAttribute('id', pid);
-    path.setAttribute('class', 'connection-line line-active');
-    svgLayer.appendChild(path);
-    const dot  = makeSvg('circle');
-    dot.setAttribute('r', '3'); dot.setAttribute('class', 'signal-particle');
-    const anim = makeSvg('animateMotion');
-    anim.setAttribute('dur', '0.56s'); anim.setAttribute('fill', 'freeze');
-    const mp = makeSvg('mpath');
-    mp.setAttribute('href', `#${pid}`);
-    mp.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href', `#${pid}`);
-    anim.appendChild(mp); dot.appendChild(anim); svgLayer.appendChild(dot);
-    setTimeout(() => { path.classList.replace('line-active','line-visible'); dot.remove(); }, 570);
 }
 
 function drawConnections(visible = false) {
@@ -875,11 +892,53 @@ function drawConnections(visible = false) {
             layers[i+1].querySelectorAll('.neuron').forEach(nB => {
                 const p = makeSvg('path');
                 p.setAttribute('d', getBezier(nA.getBoundingClientRect(), nB.getBoundingClientRect()));
+                p.setAttribute('data-from', nA.id);
+                p.setAttribute('data-to', nB.id);
                 p.setAttribute('class', 'connection-line' + (visible ? ' line-visible' : ''));
                 svgLayer.appendChild(p);
             });
         });
     }
+}
+
+function initHoverTracing() {
+    const neurons = document.querySelectorAll('.neuron');
+    neurons.forEach(node => {
+        node.addEventListener('mouseenter', () => highlightPathway(node.id));
+        node.addEventListener('mouseleave', resetPathway);
+    });
+}
+
+function highlightPathway(nodeId) {
+    document.querySelectorAll('.neuron').forEach(n => n.classList.add('dimmed'));
+    document.querySelectorAll('.connection-line').forEach(l => l.classList.add('dimmed'));
+    
+    const hoveredNode = document.getElementById(nodeId);
+    if(hoveredNode) hoveredNode.classList.remove('dimmed');
+    
+    document.querySelectorAll(`path[data-to="${nodeId}"]`).forEach(p => {
+        p.classList.remove('dimmed');
+        p.classList.add('highlighted-path');
+        const sourceId = p.getAttribute('data-from');
+        const srcNode = document.getElementById(sourceId);
+        if(srcNode) srcNode.classList.remove('dimmed');
+    });
+    
+    document.querySelectorAll(`path[data-from="${nodeId}"]`).forEach(p => {
+        p.classList.remove('dimmed');
+        p.classList.add('highlighted-path');
+        const targetId = p.getAttribute('data-to');
+        const tgtNode = document.getElementById(targetId);
+        if(tgtNode) tgtNode.classList.remove('dimmed');
+    });
+}
+
+function resetPathway() {
+    document.querySelectorAll('.neuron').forEach(n => n.classList.remove('dimmed'));
+    document.querySelectorAll('.connection-line').forEach(l => {
+        l.classList.remove('dimmed');
+        l.classList.remove('highlighted-path');
+    });
 }
 
 function openModal(title, content) {
