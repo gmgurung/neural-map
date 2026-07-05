@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manish Gurung</title>
+    <title>Manish Gurung — Data Scientist</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
@@ -514,17 +514,24 @@
 
         /* ── RESPONSIVE ── */
         @media (max-width: 768px) {
-            .profile-name { font-size: 52px; }
-            .layer { flex-direction: column; }
+            .profile-name { font-size: clamp(40px, 10vw, 52px); }
+            .profile-tagline { font-size: 11px; }
+            .main-content { padding: 90px 16px 60px; }
+            .layer { flex-direction: row; flex-wrap: wrap; }
+            #layer-2 { flex-wrap: wrap; }
+            .neuron { padding: 0 16px; font-size: 14px; height: 44px; }
             .section-divider { display: none; }
-            .modal-box { padding: 48px 22px 28px; }
-            .sidebar-toggle { top: 16px; left: 16px; }
-            .sidebar { width: 100%; }
+            .modal-box { padding: 36px 24px 28px; width: 95%; max-width: 100%; margin: 10px; }
+            #modal-title { font-size: clamp(24px, 7vw, 32px); margin-bottom: 16px; padding-bottom: 12px; }
+            .modal-close { top: 12px; right: 12px; }
+            .sidebar-toggle { top: 12px; left: 12px; padding: 8px 16px; font-size: 11px; }
+            .sidebar { width: 100vw; padding: 70px 24px 30px; }
             .sb-name { font-size: clamp(32px, 8vw, 44px); }
             .gallery-card {
-                position: relative; right: auto; top: auto; margin: 24px auto 0;
-                width: 100%; max-width: 280px; z-index: 10;
+                position: fixed; right: 16px; bottom: 16px; top: auto; width: calc(100vw - 32px); max-width: 300px;
+                transform-origin: bottom right; z-index: 10;
             }
+            .gallery-img-container { height: 160px; }
         }
     </style>
 </head>
