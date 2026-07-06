@@ -273,8 +273,8 @@
         .layer-container-box { position: relative; margin-bottom: 68px; display: flex; flex-direction: column; align-items: center; width: 100%; }
         .layer-meta { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; }
         .layer-badge { font-family: var(--font-m); font-size: 13px; color: var(--accent); border: 1px solid var(--border); padding: 3px 9px; background: var(--accent-dim); }
-        .layer-title { font-family: var(--font-m); font-size: 13px; letter-spacing: 5px; text-transform: uppercase; color: var(--text-muted); }
-        .layer-count { font-family: var(--font-m); font-size: 13px; color: var(--text-muted); opacity: 0.35; }
+        .layer-title { font-family: var(--font-m); font-size: 13px; letter-spacing: 5px; text-transform: uppercase; color: #ffffff; }
+        .layer-count { font-family: var(--font-m); font-size: 13px; color: #ffffff; opacity: 0.65; }
 
         .layer {
             opacity: 0; transform: translateY(20px);
@@ -569,6 +569,7 @@
 <aside class="sidebar" id="sidebar">
     <div class="sb-name">Manish Gurung</div>
     <div class="sb-role">Data Scientist // ML Engineer</div>
+    <img src="photo1.png" style="width: 100%; max-width: 240px; border-radius: 6px; margin-bottom: 32px; border: 1px solid rgba(255,255,255,0.1); opacity: 0.9;" alt="Manish Gurung Profile">
 
     <div class="sb-sec">
         <div class="sb-sec-title">Contact</div>
@@ -649,15 +650,6 @@
             </div>
         </div>
     </div>
-
-    <div class="sb-sec">
-        <div class="sb-sec-title">Architecture</div>
-        <div class="sb-arch-row"><div class="sb-arch-dot"></div><span class="sb-arch-txt">Input Features</span><span class="sb-arch-badge">L1</span></div>
-        <div class="sb-arch-row"><div class="sb-arch-dot"></div><span class="sb-arch-txt">Core Processing</span><span class="sb-arch-badge">L2</span></div>
-        <div class="sb-arch-row"><div class="sb-arch-dot"></div><span class="sb-arch-txt">Application Layer</span><span class="sb-arch-badge">L3</span></div>
-        <div class="sb-arch-row"><div class="sb-arch-dot"></div><span class="sb-arch-txt">Industry Layer</span><span class="sb-arch-badge">L4</span></div>
-        <div class="sb-arch-row"><div class="sb-arch-dot"></div><span class="sb-arch-txt">Output Vector</span><span class="sb-arch-badge">L5</span></div>
-    </div>
 </aside>
 
 <button class="sidebar-toggle" id="toggle-btn">INDEX</button>
@@ -736,10 +728,10 @@ const networkData = {
             ]
         },
         {
-            id: "layer-3", title: "Application Layer", badge: "L3",
+            id: "layer-3", title: "Project Layer", badge: "L3",
             neurons: [
                 { id: "proj-telemetry", label: "Client Telemetry",
-                  content: `<div class="modal-subtitle">User Frustration Scoring System · Mar 2026</div><div class="modal-tools"><strong>Tools Used:</strong> Python | JavaScript | AWS SageMaker | AWS S3 | Playwright | Express.js | React | PostgreSQL | TensorFlow Autoencoders | Scikit-Learn Isolation Forest</div><div class="project-desc-box"><p>Developed an end-to-end, three-phase machine learning system to collect user interaction data, predict user frustration level, and alert administrators in real-time.</p><ul><li><strong>Phase 1 (Ingestion & Simulation):</strong> Built a JavaScript SDK to track micro-behaviors (rage clicks, idle time, erratic scrolls) and simulated 4 automated personas using Playwright to generate training data.</li><li><strong>Phase 2 (Machine Learning Pipeline):</strong> Extracted 13 behavioral features using Pandas and deployed a dual-model Autoencoder and Isolation Forest ensemble on AWS SageMaker to yield a 0–10 frustration score.</li><li><strong>Phase 3 (Dashboard Visualization):</strong> Programmed a React administrative dashboard to view real-time frustration scores, alerts, and prioritized queues.</li></ul></div>` },
+                  content: `<div class="modal-subtitle">User Frustration Scoring System · Mar 2026</div><div class="modal-tools"><strong>Tools Used:</strong> Python | JavaScript | AWS SageMaker | AWS S3 | Playwright | Express.js | React | PostgreSQL | TensorFlow Autoencoders | Scikit-Learn Isolation Forest</div><div class="project-desc-box"><p>Developed an end-to-end, three-phase machine learning system to collect user interaction data, predict user frustration level, and alert administrators in real-time.</p><ul><li><strong>Phase 1 (Ingestion & Simulation):</strong> Built a JavaScript SDK to track micro-behaviors (rage clicks, idle time, erratic scrolls) and simulated 4 automated personas using Playwright to generate training data.</li><li><strong>Phase 2 (Machine Learning Pipeline):</strong> Extracted 13 behavioral features using Pandas and deployed a dual-model Autoencoder and Isolation Forest ensemble on AWS SageMaker to yield a 0–10 frustration score.</li><li><strong>Phase 3 (Dashboard Visualization):</strong> Programmed a React administrative dashboard to view real-time frustration scores, alerts, and prioritized queues.</li></ul><p style="margin-top: 16px;"><a href="https://seniorproject.cci.drexel.edu/project/97f77a6a-c0e9-4447-8f40-e9323614a2a2/" target="_blank" style="color: #38bdf8; text-decoration: none;">View Project Site &nearr;</a> &nbsp;|&nbsp; <a href="https://seniorproject.cci.drexel.edu/media/uploads/dig_post_37da1cba-02d7-4df6-aaab-7af4f8616376.png" target="_blank" style="color: #38bdf8; text-decoration: none;">View Poster &nearr;</a></p></div>` },
                 { id: "proj-gdp", label: "GDP Modeling",
                   content: `<div class="modal-subtitle">Vector Autoregression Model · Mar 2026</div><div class="modal-tools"><strong>Tools Used:</strong> Python | Vector Autoregressive (VAR) Modeling | GDELT API | Pandas | Statsmodels | Time-Series Forecasting</div><div class="project-desc-box"><p>Developed a statistical machine learning model to analyze how news media sentiment affects economic growth in Nepal. Configured time-series statistical preprocessing (Granger Causality and Impulse Response Function analysis) to evaluate media impacts. Designed a self-supervised forecasting pipeline with a 1-year lag, reaching a <strong>92% accuracy rate (7.99% Mean Absolute Percentage Error)</strong> for 2023–2024 economic projections.</p></div>` },
                 { id: "proj-1", label: "Reddit NLP",
@@ -751,10 +743,10 @@ const networkData = {
             ]
         },
         {
-            id: "layer-4", title: "Industry Layer", badge: "L4",
+            id: "layer-4", title: "Professional Experience Layer", badge: "L4",
             neurons: [
                 { id: "exp-1", label: "PECO (Exelon)",
-                  content: `<div class="modal-subtitle">Data Science Co-op · Sep 2025 – Mar 2026</div><div class="modal-tools"><strong>Key Technologies:</strong> Python | Power BI | SQL | 1D-CNN | XGBoost | Outage Prediction Modeling</div><div class="project-desc-box"><p>Philadelphia, PA — Conducted KPI reporting and ad-hoc analytics for <strong>1.6M customers</strong>. Developed Power BI dashboards to track storm impacts across <strong>200+ service territories</strong>. Built a hybrid <strong>1D-CNN / XGBoost ensemble</strong> model to identify premises at risk of 4+ annual outages, achieving a <strong>54% precision baseline</strong>. Recognized as the most technical and impactful co-op project, with references available from both my manager and senior data scientist.</p></div>` },
+                  content: `<div class="modal-subtitle">Data Science Co-op · Sep 2025 – Mar 2026</div><div class="modal-tools"><strong>Key Technologies:</strong> Python | Power BI | SQL | 1D-CNN | XGBoost | Outage Prediction Modeling</div><div class="project-desc-box"><p>Philadelphia, PA — Conducted KPI reporting and ad-hoc analytics for <strong>1.6M customers</strong>. Developed Power BI dashboards to track storm impacts across <strong>200+ service territories</strong>. Built a hybrid <strong>1D-CNN / XGBoost ensemble</strong> model to identify premises at risk of 4+ annual outages, achieving a <strong>54% precision baseline</strong>. Recognized as the most technical and impactful co-op project, with references available from both my manager and senior data scientist.</p><img src="peco (2).jpg" style="width: 100%; margin-top: 16px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.1);" alt="PECO Experience"></div>` },
                 { id: "exp-2", label: "Drexel TA",
                   content: `<div class="modal-subtitle">Course Assistant · Apr 2025 – Sep 2025</div><div class="modal-tools"><strong>Domain Areas:</strong> Recommender Systems | System Design | Data Curation | MLOps Best Practices</div><div class="project-desc-box"><p>Guided <strong>90+ students</strong> through Recommender Systems, System Design, and Data Curation. Promoted MLOps best practices. Earned a <strong>4.5 / 5 satisfaction score</strong> from students.</p></div>` },
                 { id: "exp-3", label: "NBME",
@@ -948,13 +940,42 @@ function resetPathway() {
     });
 }
 
+let typeTimeouts = [];
+function typeOutDOM(container) {
+    const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT, null, false);
+    const nodes = [];
+    let n;
+    while (n = walker.nextNode()) {
+        if(n.nodeValue.trim() !== '') {
+            nodes.push({ node: n, text: n.nodeValue });
+            n.nodeValue = '';
+        }
+    }
+    let charCount = 0;
+    const speed = 2.5;
+    nodes.forEach(nObj => {
+        for(let i = 0; i < nObj.text.length; i++) {
+            const t = setTimeout(() => { nObj.node.nodeValue += nObj.text[i]; }, charCount * speed);
+            typeTimeouts.push(t);
+            charCount++;
+        }
+    });
+}
+function clearTyping() {
+    typeTimeouts.forEach(clearTimeout);
+    typeTimeouts = [];
+}
+
 function openModal(title, content) {
+    clearTyping();
     modalTitle.textContent = title;
     modalBody.innerHTML = content;
     modal.classList.add('open');
     document.body.style.overflow = 'hidden';
+    typeOutDOM(modalTitle);
+    typeOutDOM(modalBody);
 }
-function closeModal() { modal.classList.remove('open'); document.body.style.overflow = ''; }
+function closeModal() { clearTyping(); modal.classList.remove('open'); document.body.style.overflow = ''; }
 
 document.getElementById('modal-close-btn').onclick = closeModal;
 document.querySelector('.modal-backdrop').onclick   = closeModal;
@@ -980,6 +1001,13 @@ function initParticles() {
     window.addEventListener('resize', () => { resize(); drawConnections(true); });
     resize();
     for (let i = 0; i < 22; i++) pts.push({ x: Math.random()*canvas.width, y: Math.random()*canvas.height, vx: (Math.random()-0.5)*0.15, vy: (Math.random()-0.5)*0.15, s: Math.random()*0.8+0.2 });
+    
+    let mouse = { x: innerWidth/2, y: innerHeight/2 };
+    window.addEventListener('mousemove', e => {
+        mouse.x = e.clientX;
+        mouse.y = e.clientY;
+    });
+
     (function tick() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.fillStyle = 'rgba(56,189,248,0.5)';
@@ -987,6 +1015,16 @@ function initParticles() {
             p.x += p.vx; p.y += p.vy;
             if (p.x < 0 || p.x > canvas.width)  p.vx *= -1;
             if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
+            
+            const dx = p.x - mouse.x;
+            const dy = p.y - mouse.y;
+            const dist = Math.sqrt(dx*dx + dy*dy);
+            if (dist < 180) {
+                const force = (180 - dist) / 180;
+                p.x += (dx / dist) * force * 1.5;
+                p.y += (dy / dist) * force * 1.5;
+            }
+            
             ctx.beginPath(); ctx.arc(p.x, p.y, p.s, 0, Math.PI*2); ctx.fill();
         });
         requestAnimationFrame(tick);
